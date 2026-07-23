@@ -4,25 +4,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChefHat,
-  Search,
-  Menu,
-  X,
-  Bell,
-  User,
-  PlusCircle,
-  LogOut,
-  LayoutDashboard,
-} from "lucide-react";
+import { ChefHat, Search, Menu, X, Bell, User, PlusCircle, LogOut, LayoutDashboard } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import NavLinks from "@/components/layout/NavLinks";
-import MobileNavLinks from "@/components/layout/MobileNavLinks";
+import MobileMenu from "@/components/layout/MobileMenu";
 import ThemeToggle from "@/components/layout/ThemeToggle";
+import { useSession, signOut } from "@/lib/auth-client";
 
-interface CurrentUser {
-  name: string;
-  avatar: string;
-}
+// TODO(feature-flag): flip to true once the notification system ships
+const NOTIFICATIONS_ENABLED = false;
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,8 +22,9 @@ export default function Navbar() {
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
 
-  // TODO(wire-up): replace with real auth state
-  const currentUser: CurrentUser | null = null;
+  const router = useRouter();
+  const { data: session } = useSession();
+  const currentUser = session?.user;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -45,6 +37,20 @@ export default function Navbar() {
     e.preventDefault();
     if (!query.trim()) return;
     window.location.href = `/explore?search=${encodeURIComponent(query.trim())}`;
+  };
+
+  const handleLogout = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Logged out successfully");
+          setProfileOpen(false);
+          setMobileOpen(false);
+          router.push("/");
+          router.refresh();
+        },
+      },
+    });
   };
 
   return (
@@ -78,8 +84,8 @@ export default function Navbar() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search */}
-          <div className="hidden sm:block">
+          {/* Search — desktop only */}
+          <div className="hidden md:block">
             <AnimatePresence initial={false} mode="wait">
               {searchOpen ? (
                 <motion.form
@@ -116,25 +122,30 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
 
-          {/* Theme toggle */}
-          <ThemeToggle />
+          {/* Theme toggle — desktop only; moved into MobileMenu for mobile */}
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
 
           {currentUser ? (
             <>
-              <Link
-                href="/dashboard"
-                className="relative flex h-10 w-10 items-center justify-center rounded-2xl text-gray-500 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:text-gray-400 dark:hover:bg-gray-800"
-                aria-label="Notifications"
-              >
-                <Bell size={20} />
-                <motion.span
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 1.6, repeat: Infinity }}
-                  className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500"
-                />
-              </Link>
+              {/* Notification bell — desktop only, and only once the feature is live */}
+              {NOTIFICATIONS_ENABLED && (
+                <Link
+                  href="/dashboard"
+                  className="relative hidden h-10 w-10 items-center justify-center rounded-2xl text-gray-500 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:text-gray-400 dark:hover:bg-gray-800 md:flex"
+                  aria-label="Notifications"
+                >
+                  <Bell size={20} />
+                  <motion.span
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 1.6, repeat: Infinity }}
+                    className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500"
+                  />
+                </Link>
+              )}
 
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="hidden md:block">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="hidden lg:block">
                 <Link
                   href="/recipes/add"
                   className="flex items-center gap-1.5 rounded-2xl bg-green-800 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700"
@@ -145,14 +156,34 @@ export default function Navbar() {
               </motion.div>
 
               <div className="relative">
+                {/* Desktop avatar — opens dropdown */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   onClick={() => setProfileOpen((v) => !v)}
-                  className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border-2 border-orange-500"
+                  className="relative hidden h-10 w-10 items-center justify-center overflow-hidden rounded-2xl ring-2 ring-orange-500/30 md:flex"
                   aria-label="Open profile menu"
                 >
-                  <Image src={currentUser.avatar} alt={currentUser.name} fill sizes="40px" className="object-cover" />
+                  <Image
+                    src={currentUser.image || "/default-avatar.png"}
+                    alt={currentUser.name}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500 dark:border-gray-900" />
                 </motion.button>
+
+                {/* Compact avatar for mobile bar — no dropdown, hamburger handles navigation */}
+                <div className="relative h-9 w-9 overflow-hidden rounded-2xl ring-2 ring-orange-500/30 md:hidden">
+                  <Image
+                    src={currentUser.image || "/default-avatar.png"}
+                    alt={currentUser.name}
+                    fill
+                    sizes="36px"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-white bg-green-500 dark:border-gray-900" />
+                </div>
 
                 <AnimatePresence>
                   {profileOpen && (
@@ -161,7 +192,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-gray-100 bg-white py-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+                      className="absolute right-0 mt-2 hidden w-52 overflow-hidden rounded-2xl border border-gray-100 bg-white py-2 shadow-xl dark:border-gray-800 dark:bg-gray-900 md:block"
                     >
                       <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800">
                         <LayoutDashboard size={16} /> Dashboard
@@ -169,8 +200,12 @@ export default function Navbar() {
                       <Link href="/profile/me" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800">
                         <User size={16} /> My Profile
                       </Link>
-                      <button className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <LogOut size={16} /> Logout
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      >
+                        <LogOut size={16} />
+                        Logout
                       </button>
                     </motion.div>
                   )}
@@ -178,7 +213,7 @@ export default function Navbar() {
               </div>
             </>
           ) : (
-            <div className="hidden items-center gap-2 sm:flex">
+            <div className="hidden items-center gap-2 md:flex">
               <Link
                 href="/login"
                 className="rounded-2xl px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -217,18 +252,12 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — search + links + theme + auth actions, all merged in one place */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900 md:hidden"
-          >
-            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 px-4 pt-4">
-              <div className="flex w-full items-center rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+          <>
+            <div className="border-t border-gray-100 px-4 pt-4 dark:border-gray-800 md:hidden">
+              <form onSubmit={handleSearchSubmit} className="flex items-center rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
                 <Search size={16} className="text-gray-400 dark:text-gray-500" />
                 <input
                   value={query}
@@ -236,31 +265,18 @@ export default function Navbar() {
                   placeholder="Search recipes..."
                   className="ml-2 w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-100 dark:placeholder:text-gray-500"
                 />
-              </div>
-            </form>
-
-            <MobileNavLinks onLinkClick={() => setMobileOpen(false)} />
-
-            <div className="flex flex-col gap-2 border-t border-gray-100 px-4 py-4 dark:border-gray-800">
-              {currentUser ? (
-                <Link
-                  href="/recipes/add"
-                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-green-800 px-4 py-2.5 text-sm font-semibold text-white"
-                >
-                  <PlusCircle size={16} /> Add Recipe
-                </Link>
-              ) : (
-                <>
-                  <Link href="/login" className="rounded-2xl border border-gray-200 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">
-                    Log in
-                  </Link>
-                  <Link href="/register" className="rounded-2xl bg-orange-500 px-4 py-2.5 text-center text-sm font-semibold text-white">
-                    Sign up
-                  </Link>
-                </>
-              )}
+              </form>
             </div>
-          </motion.div>
+            <MobileMenu
+              currentUser={
+                currentUser
+                  ? { name: currentUser.name, email: currentUser.email, avatar: currentUser.image || "/default-avatar.png" }
+                  : null
+              }
+              onLinkClick={() => setMobileOpen(false)}
+              onLogout={handleLogout}
+            />
+          </>
         )}
       </AnimatePresence>
     </motion.header>

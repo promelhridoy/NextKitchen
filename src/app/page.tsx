@@ -1,17 +1,31 @@
+import CategoriesSection from "@/components/home/CategoriesSection";
+import CTASection from "@/components/home/CTASection";
+import EditorsPicksSection from "@/components/home/EditorsPicksSection";
+import FAQSection from "@/components/home/FAQSection";
+import FeaturedCreatorsSection from "@/components/home/FeaturedCreatorsSection";
+import Hero from "@/components/home/Hero";
+import MostViewedSection from "@/components/home/MostViewedSection";
+import NewsletterSection from "@/components/home/NewsletterSection";
+import StatsCounterSection from "@/components/home/StatsCounterSection";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
+import TrendingSection from "@/components/home/TrendingSection";
 
 
-interface User {
-  name: string;
-  age: number;
-}
 
 export default function Home() {
-  const user: User = { name: "Rahim", age: 25 };
   return (
-     <main style={{ padding: "2rem" }}>
-      <h1>Welcome to NextKitchen 🍳</h1>
-      <p>My first Next.js + TypeScript project!</p>
-      <p>Name: {user.name}, Age: {user.age}</p>
+     <main>
+     <Hero />
+      <TrendingSection />
+      <CategoriesSection />
+      <EditorsPicksSection />
+      <MostViewedSection />
+      <FeaturedCreatorsSection />
+      <StatsCounterSection />
+      <TestimonialsSection />
+      <NewsletterSection />
+      <FAQSection />
+      <CTASection />
     </main>
   );
 }
