@@ -60,3 +60,11 @@ export const MY_RECIPES: MyRecipeRow[] = [
   { id: "9", title: "Homestyle Fish Curry with Mustard Oil", coverImage: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&q=80", status: "draft", views: 0, likes: 0, createdAt: "2026-07-18" },
   { id: "10", title: "Weeknight Chickpea Curry", coverImage: "https://images.unsplash.com/photo-1631515242808-497c3fbd3972?w=200&q=80", status: "published", views: 1890, likes: 156, createdAt: "2026-04-02" },
 ];
+
+import { SAMPLE_RECIPES } from "@/data/homeData";
+
+export const COLLECTION_RECIPES: Record<string, typeof SAMPLE_RECIPES> = {
+  c1: SAMPLE_RECIPES.slice(0, 4),
+  c2: SAMPLE_RECIPES.slice(2, 5),
+  c3: SAMPLE_RECIPES.slice(4, 7),
+};

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import ThemeProvider from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 
@@ -37,15 +35,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <Navbar />
-    <main className="flex-1">
-      {children}
-      <Toaster richColors position="top-right" />
-    </main>
-    <Footer />
-  </ThemeProvider>
-</body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+          <Toaster richColors position="top-right" />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

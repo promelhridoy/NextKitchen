@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Link as LinkIcon, Instagram, Youtube, UserPlus, BookOpen, Heart } from "lucide-react";
+import { MapPin, Link as LinkIcon, UserPlus, BookOpen, Heart } from "lucide-react";
+import { FaInstagram, FaYoutube } from "react-icons/fa6";
 import RecipeCard from "@/components/recipe/RecipeCard";
 import { SAMPLE_RECIPES } from "@/data/homeData";
 
@@ -75,11 +76,11 @@ export default function ProfileClient({ profileId }: ProfileClientProps) {
               <LinkIcon size={13} /> {profile.website}
             </a>
             <a href={`https://instagram.com/${profile.socialLinks.instagram}`} className="flex items-center gap-1 hover:text-orange-500">
-              <Instagram size={13} /> @{profile.socialLinks.instagram}
-            </a>
-            <a href={`https://youtube.com/${profile.socialLinks.youtube}`} className="flex items-center gap-1 hover:text-orange-500">
-              <Youtube size={13} /> {profile.socialLinks.youtube}
-            </a>
+  <FaInstagram size={13} /> @{profile.socialLinks.instagram}
+</a>
+<a href={`https://youtube.com/${profile.socialLinks.youtube}`} className="flex items-center gap-1 hover:text-orange-500">
+  <FaYoutube size={13} /> {profile.socialLinks.youtube}
+</a>
           </div>
 
           <div className="mt-4 flex justify-center gap-6 sm:justify-start">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, Search, Menu, X, Bell, User, PlusCircle, LogOut, LayoutDashboard } from "lucide-react";
+import { ChefHat, Search, Menu, X, Bell, User, PlusCircle, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import NavLinks from "@/components/layout/NavLinks";
@@ -25,6 +25,7 @@ export default function Navbar() {
   const router = useRouter();
   const { data: session } = useSession();
   const currentUser = session?.user;
+  console.log("Current user in Navbar:", currentUser); // Debugging line to check the current user
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -40,18 +41,18 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          toast.success("Logged out successfully");
-          setProfileOpen(false);
-          setMobileOpen(false);
-          router.push("/");
-          router.refresh();
-        },
+  await signOut({
+    redirectTo: "/", // 👈 সরাসরি Home page-এ নিয়ে যাবে
+    fetchOptions: {
+      onSuccess: () => {
+        toast.success("Logged out successfully");
+        setProfileOpen(false);
+        setMobileOpen(false);
+        router.refresh();
       },
-    });
-  };
+    },
+  });
+};
 
   return (
     <motion.header
@@ -197,9 +198,21 @@ export default function Navbar() {
                       <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800">
                         <LayoutDashboard size={16} /> Dashboard
                       </Link>
+                      {currentUser.role === "admin" && (
+              <li>
+                <Link 
+                  href="/admin" 
+                  className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20"
+                >
+                  <ShieldCheck size={17} /> 
+                  Admin Panel
+                </Link>
+              </li>
+            )}
                       <Link href="/profile/me" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800">
                         <User size={16} /> My Profile
                       </Link>
+                      
                       <button
                         onClick={handleLogout}
                         className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -268,14 +281,19 @@ export default function Navbar() {
               </form>
             </div>
             <MobileMenu
-              currentUser={
-                currentUser
-                  ? { name: currentUser.name, email: currentUser.email, avatar: currentUser.image || "/default-avatar.png" }
-                  : null
-              }
-              onLinkClick={() => setMobileOpen(false)}
-              onLogout={handleLogout}
-            />
+  currentUser={
+    currentUser
+      ? { 
+          name: currentUser.name, 
+          email: currentUser.email, 
+          avatar: currentUser.image || "/default-avatar.png",
+          role: currentUser.role ?? "user" // 👈 Add role here
+        }
+      : null
+  }
+  onLinkClick={() => setMobileOpen(false)}
+  onLogout={handleLogout}
+/>
           </>
         )}
       </AnimatePresence>

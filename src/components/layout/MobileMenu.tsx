@@ -10,11 +10,12 @@ import {
   Info,
   Mail,
   PlusCircle,
-  BookOpen,
-  Settings,
   Sun,
   Moon,
   LogOut,
+  LayoutDashboard,
+  User,
+  ShieldCheck,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { NAV_LINKS } from "@/data/navLink";
@@ -23,6 +24,7 @@ interface CurrentUser {
   name: string;
   email: string;
   avatar: string;
+  role: string; 
 }
 
 interface MobileMenuProps {
@@ -101,23 +103,37 @@ export default function MobileMenu({ currentUser, onLinkClick, onLogout }: Mobil
               </Link>
             </li>
             <li>
-              <Link
-                href="/dashboard/my-recipes"
+              <Link 
+                href="/dashboard"
                 onClick={onLinkClick}
                 className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
               >
-                <BookOpen size={17} className="text-gray-400 dark:text-gray-500" />
-                My Recipes
+                <LayoutDashboard size={17} className="text-gray-400 dark:text-gray-500" />
+                Dashboard
               </Link>
             </li>
+
+            {currentUser.role === "admin" && (
+              <li>
+                <Link 
+                  href="/admin" 
+                  onClick={onLinkClick}
+                  className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20"
+                >
+                  <ShieldCheck size={17} /> 
+                  Admin Panel
+                </Link>
+              </li>
+            )}
+
             <li>
-              <Link
-                href="/settings"
+              <Link 
+                href="/profile/me"
                 onClick={onLinkClick}
                 className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
               >
-                <Settings size={17} className="text-gray-400 dark:text-gray-500" />
-                Settings
+                <User size={17} className="text-gray-400 dark:text-gray-500" /> 
+                My Profile
               </Link>
             </li>
           </ul>
