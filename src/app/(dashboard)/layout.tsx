@@ -6,10 +6,10 @@ export default function DashboardGroupLayout({ children }: { children: React.Rea
   return (
     <div className="relative flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950">
       <DashboardSidebar />
-      {/* <DashboardMobileBar /> */}
+      <DashboardMobileBar />
       <div className="flex flex-1 flex-col lg:ml-64">
         <main className="flex-1">
-          <div className="  mt-[0rem] lg:mt-[-50rem] px-4 py-6 pb-12 md:px-8">{children}</div>
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 pb-12 md:px-8">{children}</div>
         </main>
         <Footer />
       </div>

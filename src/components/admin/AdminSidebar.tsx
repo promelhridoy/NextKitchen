@@ -1,37 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  LayoutDashboard,
-  FolderTree,
-  BookOpen,
-  Users,
-  Menu,
-  X,
-  ChefHat,
-  LogOut,
-} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { LayoutDashboard, Users, ShieldCheck, FolderTree, ChefHat, Home, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useSession, signOut } from "@/lib/auth-client";
 
-const ADMIN_SIDEBAR_LINKS = [
-  { label: "Overview", href: "/admin", icon: LayoutDashboard },
-  { label: "Categories", href: "/admin/categories", icon: FolderTree },
-  { label: "Recipes", href: "/admin/recipes", icon: BookOpen },
-  { label: "Users", href: "/admin/users", icon: Users },
+const ADMIN_LINKS = [
+  { name: "Overview", path: "/admin", icon: LayoutDashboard },
+  { name: "Manage Users", path: "/admin/users", icon: Users },
+  { name: "Manage Recipes", path: "/admin/recipes", icon: ShieldCheck },
+  { name: "Categories", path: "/admin/categories", icon: FolderTree },
 ];
 
 export default function AdminSidebar() {
-    const pathname = usePathname();
+  const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const user = session?.user;
+  useEffect(() => setMounted(true), []);
 
   const handleLogout = async () => {
     await signOut({
@@ -45,132 +36,91 @@ export default function AdminSidebar() {
     });
   };
 
-  const SidebarContent = (
-    <div className="flex h-full flex-col">
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 px-5 py-5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 text-white">
-          <ChefHat size={18} strokeWidth={2.2} />
-        </span>
-        <span className="text-base font-bold tracking-tight text-green-800 dark:text-green-400">
-          Nest<span className="text-orange-500">Kitchen</span>
-        </span>
-      </Link>
-
-      {/* User summary */}
-      {user && (
-        <div className="mx-4 mb-4 flex items-center gap-3 rounded-2xl bg-gray-50 p-3 dark:bg-gray-800">
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl ring-2 ring-orange-500/30">
-            <Image src={user.image || "/default-avatar.png"} alt={user.name} fill sizes="40px" className="object-cover" />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
-            <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
-          </div>
+  if (!mounted) {
+    return (
+      <aside className="fixed left-0 top-0 z-20 hidden h-screen w-64 shrink-0 border-r border-gray-100 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 lg:block">
+        <div className="mb-8 h-8 w-3/4 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-11 w-full animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
+          ))}
         </div>
-      )}
+      </aside>
+    );
+  }
 
-
-      {/* Nav links */}
-      <nav className="mt-6 flex-1 space-y-1 px-3">
-        {ADMIN_SIDEBAR_LINKS.map((link) => {
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors"
-            >
-              {isActive && (
-                <motion.span
-                  layoutId="sidebar-active-bg"
-                  className="absolute inset-0 rounded-2xl bg-orange-50 dark:bg-orange-900/20"
-                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                />
-              )}
-              <link.icon
-                size={17}
-                className={`relative z-10 ${isActive ? "text-orange-500" : "text-gray-400 dark:text-gray-500"}`}
-              />
-              <span className={`relative z-10 ${isActive ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300"}`}>
-                {link.label}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="border-t border-gray-100 p-3 dark:border-gray-800">
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-        >
-          <LogOut size={17} />
-          Logout
-        </button>
-      </div>
-    </div>
-  );
+  const user = session?.user;
 
   return (
-    <>
-      {/* Desktop sidebar — always visible */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900 lg:block">
-        {SidebarContent}
-      </aside>
+    <aside className="fixed left-0 top-0 z-20 hidden h-screen w-64 shrink-0 border-r border-gray-100 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 lg:block">
+      <div className="flex h-full flex-col justify-between pb-4">
+        <div className="space-y-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 text-white">
+              <ChefHat size={18} strokeWidth={2.2} />
+            </span>
+            <span className="text-base font-bold tracking-tight text-green-800 dark:text-green-400">
+              Nest<span className="text-orange-500">Kitchen</span>
+            </span>
+          </Link>
 
-      {/* Mobile top bar with hamburger */}
-      <div className="flex items-center justify-between border-b border-gray-100 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900 lg:hidden">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-orange-500 text-white">
-            <ChefHat size={16} strokeWidth={2.2} />
+          <span className="inline-block rounded-2xl border border-red-200 bg-red-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
+            Admin Panel
           </span>
-          <span className="text-sm font-bold text-green-800 dark:text-green-400">
-            Nest<span className="text-orange-500">Kitchen</span>
-          </span>
-        </Link>
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="flex h-9 w-9 items-center justify-center rounded-2xl text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-          aria-label="Open dashboard menu"
-        >
-          <Menu size={20} />
-        </button>
+
+          <nav className="flex flex-col gap-1">
+            {ADMIN_LINKS.map((item) => {
+              const isActive = pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className="group relative flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors"
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="admin-sidebar-active-bg"
+                      className="absolute inset-0 rounded-2xl bg-orange-50 dark:bg-orange-900/20"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <span className={`relative z-10 ${isActive ? "text-orange-500" : "text-gray-400 dark:text-gray-500"}`}>
+                    <item.icon size={17} />
+                  </span>
+                  <span className={`relative z-10 ${isActive ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300"}`}>
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="mt-auto space-y-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+          {user && (
+            <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-2.5 dark:border-gray-800 dark:bg-gray-800">
+              <div className="relative h-9 w-9 shrink-0">
+                <Image src={user.image || "/default-avatar.png"} alt={user.name} fill sizes="36px" className="rounded-2xl object-cover ring-2 ring-orange-500/30" />
+              </div>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-xs font-semibold text-gray-900 dark:text-gray-100">{user.name}</span>
+                <span className="truncate text-[10px] text-gray-500 dark:text-gray-400">{user.email}</span>
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-left text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            <LogOut size={15} /> Logout
+          </button>
+
+          <Link href="/" className="flex items-center gap-3 rounded-2xl px-4 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200">
+            <Home size={15} /> Back to Home
+          </Link>
+        </div>
       </div>
-
-      {/* Mobile slide-over sidebar */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl dark:bg-gray-900 lg:hidden"
-            >
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-2xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                aria-label="Close menu"
-              >
-                <X size={18} />
-              </button>
-              {SidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-    </>
-    );
-
+    </aside>
+  );
 }

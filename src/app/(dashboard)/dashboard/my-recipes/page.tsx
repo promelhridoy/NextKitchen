@@ -1,12 +1,9 @@
-import MyRecipesClient from '@/components/dashboard/MyRecipesClient';
-import React from 'react';
+// app/(dashboard)/dashboard/my-recipes/page.tsx
+import type { Metadata } from "next";
+import MyRecipesClient from "@/components/dashboard/MyRecipesClient";
 
-const MyRecipesPage = () => {
-    return (
-        <div className=" px-4 py-6 pb-12 md:px-8">
-            <MyRecipesClient />
-        </div>
-    );
-};
+export const metadata: Metadata = { title: "My Recipes" };
 
-export default MyRecipesPage;
+export default function MyRecipesPage() {
+  return <MyRecipesClient />;
+}

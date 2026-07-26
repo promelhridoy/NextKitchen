@@ -1,9 +1,8 @@
+// app/(dashboard)/dashboard/page.tsx
 import type { Metadata } from "next";
 import DashboardClient from "@/components/dashboard/DashboardClient";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-};
+export const metadata: Metadata = { title: "Dashboard" };
 
 export default function DashboardPage() {
   return <DashboardClient />;

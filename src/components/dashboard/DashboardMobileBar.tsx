@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChefHat, Menu, X, LayoutDashboard, BookOpen, Heart, Bell, Settings } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
 
 const MENU_ITEMS = [
   { name: "Overview", path: "/dashboard", icon: LayoutDashboard },
@@ -17,7 +16,6 @@ const MENU_ITEMS = [
 
 export default function DashboardMobileBar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
 
   return (

@@ -30,13 +30,11 @@ export default function NotificationsClient() {
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    // TODO(wire-up): PATCH /api/notifications/read-all
     toast.success("All notifications marked as read");
   };
 
   const markOneRead = (id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-    // TODO(wire-up): PATCH /api/notifications/:id/read
   };
 
   const visible = filter === "unread" ? notifications.filter((n) => !n.read) : notifications;
@@ -52,38 +50,23 @@ export default function NotificationsClient() {
           </p>
         </div>
         {unreadCount > 0 && (
-          <button
-            onClick={markAllRead}
-            className="flex items-center gap-1.5 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-          >
+          <button onClick={markAllRead} className="flex items-center gap-1.5 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             <CheckCheck size={16} /> Mark all as read
           </button>
         )}
       </div>
 
-      {/* Filter tabs */}
       <div className="mb-6 inline-flex gap-1 rounded-2xl border border-gray-200 bg-white p-1 dark:border-gray-800 dark:bg-gray-900">
         {(["all", "unread"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`relative rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
-              filter === f ? "text-white" : "text-gray-600 dark:text-gray-300"
-            }`}
-          >
+          <button key={f} onClick={() => setFilter(f)} className={`relative rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${filter === f ? "text-white" : "text-gray-600 dark:text-gray-300"}`}>
             {filter === f && (
-              <motion.span
-                layoutId="notif-filter-bg"
-                className="absolute inset-0 rounded-2xl bg-orange-500"
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              />
+              <motion.span layoutId="notif-filter-bg" className="absolute inset-0 rounded-2xl bg-orange-500" transition={{ type: "spring", stiffness: 350, damping: 30 }} />
             )}
             <span className="relative z-10 capitalize">{f}</span>
           </button>
         ))}
       </div>
 
-      {/* List */}
       {visible.length > 0 ? (
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900">
           <AnimatePresence initial={false}>
@@ -103,9 +86,7 @@ export default function NotificationsClient() {
                     <config.icon size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-sm ${n.read ? "text-gray-600 dark:text-gray-400" : "font-medium text-gray-900 dark:text-gray-100"}`}>
-                      {n.message}
-                    </p>
+                    <p className={`text-sm ${n.read ? "text-gray-600 dark:text-gray-400" : "font-medium text-gray-900 dark:text-gray-100"}`}>{n.message}</p>
                     <p className="mt-0.5 text-xs text-gray-400">{n.time}</p>
                   </div>
                   {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-orange-500" />}

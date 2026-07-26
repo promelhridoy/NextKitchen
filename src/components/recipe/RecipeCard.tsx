@@ -14,7 +14,7 @@ export interface Recipe {
   difficulty: "Easy" | "Medium" | "Hard";
   averageRating: number;
   ratingCount: number;
-  author: { name: string; avatar: string };
+  author: { id: string; name: string; avatar: string };
   category: string;
   likeCount: number;
 }
@@ -71,12 +71,16 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
         </div>
 
         <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-          <div className="flex items-center gap-2">
+          <Link
+            href={`/profile/${recipe.author.id}`}
+            className="flex items-center gap-2 hover:opacity-80"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="relative h-6 w-6 overflow-hidden rounded-full">
               <Image src={recipe.author.avatar} alt={recipe.author.name} fill sizes="24px" className="object-cover" />
             </div>
             <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{recipe.author.name}</span>
-          </div>
+          </Link>
           <span className="flex items-center gap-1 text-xs text-gray-400">
             <ChefHat size={13} /> {recipe.likeCount}
           </span>

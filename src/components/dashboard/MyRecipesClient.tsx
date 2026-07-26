@@ -20,27 +20,23 @@ export default function MyRecipesClient() {
     if (!isPending && !session) router.replace("/login");
   }, [isPending, session, router]);
 
-  if (isPending) return <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><div className="h-64 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" /></div>;
+  if (isPending) return <div className="h-64 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />;
   if (!session) return null;
 
   const togglePublish = (id: string) => {
-    setRecipes((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: r.status === "published" ? "draft" : "published" } : r))
-    );
-    // TODO(wire-up): PATCH /api/recipes/:id { status }
+    setRecipes((prev) => prev.map((r) => (r.id === id ? { ...r, status: r.status === "published" ? "draft" : "published" } : r)));
     toast.success("Recipe status updated");
   };
 
   const confirmDelete = () => {
     if (!deleteTarget) return;
     setRecipes((prev) => prev.filter((r) => r.id !== deleteTarget.id));
-    // TODO(wire-up): DELETE /api/recipes/:id
     toast.success(`"${deleteTarget.title}" deleted`);
     setDeleteTarget(null);
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Recipes</h1>
@@ -49,25 +45,14 @@ export default function MyRecipesClient() {
 
         <div className="flex items-center gap-2">
           <div className="flex rounded-2xl border border-gray-200 p-1 dark:border-gray-700">
-            <button
-              onClick={() => setView("table")}
-              className={`rounded-xl p-2 ${view === "table" ? "bg-orange-500 text-white" : "text-gray-500"}`}
-              aria-label="Table view"
-            >
+            <button onClick={() => setView("table")} className={`rounded-xl p-2 ${view === "table" ? "bg-orange-500 text-white" : "text-gray-500"}`} aria-label="Table view">
               <List size={16} />
             </button>
-            <button
-              onClick={() => setView("grid")}
-              className={`rounded-xl p-2 ${view === "grid" ? "bg-orange-500 text-white" : "text-gray-500"}`}
-              aria-label="Grid view"
-            >
+            <button onClick={() => setView("grid")} className={`rounded-xl p-2 ${view === "grid" ? "bg-orange-500 text-white" : "text-gray-500"}`} aria-label="Grid view">
               <Grid3x3 size={16} />
             </button>
           </div>
-          <Link
-            href="/recipes/add"
-            className="rounded-2xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
-          >
+          <Link href="/recipes/add" className="rounded-2xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600">
             + Add Recipe
           </Link>
         </div>
@@ -98,13 +83,7 @@ export default function MyRecipesClient() {
                     </div>
                   </td>
                   <td className="px-5 py-3">
-                    <span
-                      className={`rounded-2xl px-2.5 py-1 text-xs font-semibold ${
-                        r.status === "published"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400"
-                          : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                      }`}
-                    >
+                    <span className={`rounded-2xl px-2.5 py-1 text-xs font-semibold ${r.status === "published" ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>
                       {r.status === "published" ? "Published" : "Draft"}
                     </span>
                   </td>
@@ -119,19 +98,10 @@ export default function MyRecipesClient() {
                       <Link href={`/recipes/${r.id}/edit`} className="rounded-xl p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Edit">
                         <Pencil size={15} />
                       </Link>
-                      <button
-                        onClick={() => togglePublish(r.id)}
-                        className="rounded-xl p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        aria-label="Toggle publish"
-                        title={r.status === "published" ? "Unpublish" : "Publish"}
-                      >
+                      <button onClick={() => togglePublish(r.id)} className="rounded-xl p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" title={r.status === "published" ? "Unpublish" : "Publish"}>
                         {r.status === "published" ? <FileEdit size={15} /> : <Globe size={15} />}
                       </button>
-                      <button
-                        onClick={() => setDeleteTarget(r)}
-                        className="rounded-xl p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                        aria-label="Delete"
-                      >
+                      <button onClick={() => setDeleteTarget(r)} className="rounded-xl p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -147,19 +117,13 @@ export default function MyRecipesClient() {
             <div key={r.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <div className="relative h-36 w-full">
                 <Image src={r.coverImage} alt={r.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-                <span
-                  className={`absolute left-3 top-3 rounded-2xl px-2.5 py-1 text-xs font-semibold ${
-                    r.status === "published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
-                  }`}
-                >
+                <span className={`absolute left-3 top-3 rounded-2xl px-2.5 py-1 text-xs font-semibold ${r.status === "published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
                   {r.status === "published" ? "Published" : "Draft"}
                 </span>
               </div>
               <div className="p-4">
                 <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{r.title}</h3>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {r.views.toLocaleString()} views · {r.likes.toLocaleString()} likes
-                </p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{r.views.toLocaleString()} views · {r.likes.toLocaleString()} likes</p>
                 <div className="mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3 dark:border-gray-800">
                   <Link href={`/recipes/${r.id}`} className="rounded-xl p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <Eye size={15} />
@@ -180,25 +144,16 @@ export default function MyRecipesClient() {
         </div>
       )}
 
-      {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 dark:bg-gray-900">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">Delete this recipe?</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              &ldquo;{deleteTarget.title}&rdquo; will be permanently removed. This can&apos;t be undone.
-            </p>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">&ldquo;{deleteTarget.title}&rdquo; will be permanently removed. This can&apos;t be undone.</p>
             <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="rounded-2xl px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-              >
+              <button onClick={() => setDeleteTarget(null)} className="rounded-2xl px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
                 Cancel
               </button>
-              <button
-                onClick={confirmDelete}
-                className="rounded-2xl bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600"
-              >
+              <button onClick={confirmDelete} className="rounded-2xl bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600">
                 Delete
               </button>
             </div>
